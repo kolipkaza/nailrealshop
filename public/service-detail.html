@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดบริการ - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .detail-page { padding: 2rem 0; }
+        .back-button {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin-bottom: 2rem; color: #B76E79; text-decoration: none;
+            font-weight: 500; transition: color 0.3s ease;
+        }
+        .back-button:hover { color: #D4AF37; }
+        .service-detail-card {
+            background: white; border-radius: 24px; padding: 3rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            max-width: 800px; margin: 0 auto;
+        }
+        .service-header {
+            display: flex; align-items: flex-start; gap: 1.5rem;
+            margin-bottom: 2rem; padding-bottom: 2rem;
+            border-bottom: 2px solid #E8D5D5;
+        }
+        .image-section { position: relative; }
+        .service-image-large {
+            width: 150px; height: 150px; border-radius: 16px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #F8F9FA 0%, #F5E6E8 100%);
+        }
+        .service-image-placeholder-large {
+            width: 150px; height: 150px; border-radius: 16px;
+            background: linear-gradient(135deg, #F8F9FA 0%, #F5E6E8 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: #636e72;
+        }
+        .service-image-placeholder-large .slot-id {
+            font-size: 0.85rem; background: rgba(183, 110, 121, 0.1);
+            color: #B76E79; padding: 0.3rem 0.8rem; border-radius: 6px;
+            font-family: monospace; margin-top: 0.5rem;
+        }
+        .upload-section { margin-top: 1rem; display: none; }
+        .upload-section.visible { display: block; }
+        .upload-label {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 1rem; background: rgba(183, 110, 121, 0.1);
+            color: #B76E79; border-radius: 8px; cursor: pointer;
+            font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease;
+        }
+        .upload-label:hover { background: rgba(183, 110, 121, 0.2); }
+        .upload-input { display: none; }
+        .upload-preview { margin-top: 0.5rem; font-size: 0.85rem; color: #636e72; }
+        .info-section { flex: 1; }
+        .service-title {
+            font-size: 2rem; font-weight: 700; color: #2D3436; margin-bottom: 0.5rem;
+        }
+        .service-title-input {
+            font-size: 2rem; font-weight: 700; color: #2D3436;
+            border: 2px dashed transparent; background: transparent;
+            width: 100%; padding: 0.25rem 0.5rem; border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .service-title-input:focus {
+            outline: none; border-color: #B76E79;
+            background: rgba(183, 110, 121, 0.05);
+        }
+        .service-title-input:disabled { border: none; background: transparent; }
+        .service-category-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+            color: white; padding: 0.4rem 1rem; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 500;
+        }
+        .category-select {
+            padding: 0.4rem 1rem; border-radius: 20px;
+            border: 2px solid #B76E79; background: white;
+            color: #B76E79; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer;
+        }
+
+        .service-description {
+            font-size: 1rem; color: #636e72; line-height: 1.7; margin-bottom: 2rem;
+        }
+        .service-description-input {
+            font-size: 1rem; color: #2D3436; line-height: 1.7;
+            border: 2px dashed transparent; background: transparent;
+            width: 100%; padding: 1rem; border-radius: 12px;
+            min-height: 120px; resize: vertical;
+        }
+        .service-description-input:focus {
+            outline: none; border-color: #B76E79;
+            background: rgba(183, 110, 121, 0.05);
+        }
+        .service-description-input:disabled { border: none; background: transparent; }
+        
+        .service-price {
+            font-size: 1.75rem; font-weight: 700; color: #B76E79; margin-bottom: 0.5rem;
+        }
+        .service-price-input {
+            font-size: 1.75rem; font-weight: 700; color: #B76E79;
+            border: 2px dashed transparent; background: transparent;
+            width: 100%; padding: 0.5rem 1rem; border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+        .service-price-input:focus {
+            outline: none; border-color: #B76E79;
+            background: rgba(183, 110, 121, 0.05);
+        }
+        .service-price-input:disabled { border: none; background: transparent; }
+        
+        .service-duration {
+            font-size: 0.95rem; color: #636e72; margin-bottom: 1rem;
+        }
+        .service-duration-input {
+            font-size: 0.95rem; color: #636e72;
+            border: 2px dashed transparent; background: transparent;
+            width: 100%; padding: 0.5rem 1rem; border-radius: 8px;
+        }
+        .service-duration-input:focus {
+            outline: none; border-color: #B76E79;
+            background: rgba(183, 110, 121, 0.05);
+        }
+        .service-duration-input:disabled { border: none; background: transparent; }
+
+        .field-label {
+            font-size: 0.85rem; font-weight: 600; color: #636e72; margin-top: 1rem;
+        }
+        .field-label-small {
+            font-size: 0.85rem; font-weight: 600; color: #636e72;
+            margin-top: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem; border-radius: 10px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(183, 110, 121, 0.4);
+        }
+        .btn-secondary {
+            background: white; color: #B76E79; border: 2px solid #B76E79;
+        }
+        .btn-secondary:hover {
+            background: #E8D5D5;
+        }
+
+        .input-field {
+            width: 100%; padding: 0.75rem 1rem; border: 2px solid #E8D5D5;
+            border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none; border-color: #B76E79; box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.1);
+        }
+        .input-field:disabled { border-color: #E8D5D5; background: #F8F9FA; cursor: not-allowed; }
+
+        .edit-mode-controls {
+            display: flex; gap: 0.75rem; margin-top: 1.5rem;
+            padding-top: 1.5rem; border-top: 2px solid #F5E6E8;
+        }
+
+        .error-message { color: #d63031; font-weight: 600; margin-bottom: 1rem; }
+        .loading-message { color: #B76E79; font-weight: 500; }
+
+        .detail-page h2 { color: #2D3436; border-left: 4px solid #B76E79; padding-left: 12px; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">💅 NailReal <span>Detail</span></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">🏠 Dashboard</a></li>
+                <li><a href="services.html">💅 บริการ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="detail-page">
+        <a href="services.html" class="back-button">← กลับไปหน้ารายการบริการ</a>
+
+        <!-- Loading State -->
+        <div id="loading-message" class="loading-message">กำลังโหลดข้อมูลบริการ...</div>
+
+        <!-- Error State -->
+        <div id="error-message" style="display: none;">
+            <p class="error-message">❌ ไม่พบข้อมูลบริการ</p>
+        </div>
+
+        <!-- Service Detail Card -->
+        <div id="service-detail-card" class="service-detail-card" style="display: none;">
+            <div class="service-header">
+                <div class="image-section">
+                    <img id="service-image" class="service-image-large" src="" alt="Service Image">
+                    <div class="upload-section" id="upload-section">
+                        <label for="image-upload" class="upload-label">
+                            📤 เปลี่ยนรูปภาพ
+                        </label>
+                        <input type="file" id="image-upload" class="upload-input" accept="image/*">
+                        <p class="upload-preview" id="upload-preview"></p>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h2 id="service-title" class="service-title"></h2>
+                    <span id="service-category-badge" class="service-category-badge"></span>
+                </div>
+            </div>
+
+            <div class="service-description">
+                <label class="field-label">📝 รายละเอียดบริการ</label>
+                <div id="service-description-content" class="service-description"></div>
+                <textarea id="service-description-input" class="service-description-input" rows="5" style="display: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <div>
+                    <label class="field-label">💰 ราคา (บาท)</label>
+                    <div id="service-price-content" class="service-price"></div>
+                    <input type="number" id="service-price-input" class="service-price-input" style="display: none;">
+                </div>
+                <div>
+                    <label class="field-label-small">⏱️ เวลาใช้เวลา (นาที)</label>
+                    <div id="service-duration-content" class="service-duration"></div>
+                    <input type="number" id="service-duration-input" class="service-duration-input" style="display: none;">
+                </div>
+            </div>
+
+            <div class="edit-mode-controls">
+                <button id="btn-edit" class="btn btn-primary">✏️ แก้ไข</button>
+                <button id="btn-save" class="btn btn-primary" style="display: none;">💾 บันทึก</button>
+                <button id="btn-cancel" class="btn btn-secondary" style="display: none;">✖️ ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./service-detail.js"></script>
+</body>
+</html>

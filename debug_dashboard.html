@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .stat-card { background: #f0f0f0; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #bf5af2; }
+        #loading { color: #666; }
+        #error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Dashboard Test</h1>
+    
+    <div class="stat-card">
+        <h3>📊 Total Services</h3>
+        <p class="stat-number" id="total-services">
+            <span id="services-loading">Loading...</span>
+        </p>
+    </div>
+    
+    <div class="stat-card">
+        <h3>👥 Total Customers</h3>
+        <p class="stat-number" id="total-customers">
+            <span id="customers-loading">Loading...</span>
+        </p>
+    </div>
+    
+    <div class="stat-card">
+        <h3>📅 Total Appointments</h3>
+        <p class="stat-number" id="today-appointments">
+            <span id="appointments-loading">Loading...</span>
+        </p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        
+        async function loadDashboardStats() {
+            try {
+                console.log('🚀 Starting dashboard stats load...');
+                
+                // Fetch services
+                console.log('📂 Fetching services...');
+                const servicesRes = await fetch(`${API_URL}/services`);
+                const services = await servicesRes.json();
+                console.log('✅ Services loaded:', services.length);
+                document.getElementById('services-loading').textContent = services.length;
+                
+                // Fetch customers
+                console.log('📂 Fetching customers...');
+                const customersRes = await fetch(`${API_URL}/customers`);
+                const customers = await customersRes.json();
+                console.log('✅ Customers loaded:', customers.length);
+                document.getElementById('customers-loading').textContent = customers.length;
+                
+                // Fetch appointments
+                console.log('📂 Fetching appointments...');
+                const appointmentsRes = await fetch(`${API_URL}/appointments`);
+                const appointments = await appointmentsRes.json();
+                console.log('✅ Appointments loaded:', appointments.length);
+                document.getElementById('appointments-loading').textContent = appointments.length;
+                
+            } catch (error) {
+                console.error('❌ Error loading dashboard stats:', error);
+                document.getElementById('services-loading').textContent = 'Error';
+                document.getElementById('customers-loading').textContent = 'Error';
+                document.getElementById('appointments-loading').textContent = 'Error';
+            }
+        }
+        
+        // Initialize
+        console.log('🎯 Initializing dashboard...');
+        loadDashboardStats();
+    </script>
+</body>
+</html>

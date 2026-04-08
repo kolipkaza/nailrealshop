@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Admin Panel Specific Styles - Rose Gold Theme */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F8F9FA; color: #2D3436; margin: 0; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        h1 { color: #B76E79; border-bottom: 3px solid #D4AF37; padding-bottom: 10px; margin-bottom: 30px; }
+        
+        /* Admin Cards */
+        .admin-section { background: white; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid #F5E6E8; }
+        .admin-section h2 { color: #2D3436; border-left: 4px solid #B76E79; padding-left: 12px; margin-top: 0; }
+        
+        /* Add Technician Form */
+        #add-tech-form { background: #F8F9FA; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; border: 2px solid #E8D5D5; }
+        #add-tech-form input, #add-tech-form select { width: 100%; padding: 12px 16px; border: 2px solid #E8D5D5; border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; transition: border-color 0.3s; }
+        #add-tech-form input:focus, #add-tech-form select:focus { border-color: #B76E79; outline: none; }
+        #add-tech-form button { background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white; border: none; padding: 12px 32px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+        #add-tech-form button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3); }
+        
+        /* Tech List */
+        #tech-list-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; min-height: 100px; }
+        .tech-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); text-align: center; transition: transform 0.2s; border: 1px solid #F5E6E8; }
+        .tech-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(183, 110, 121, 0.15); border-color: #E8D5D5; }
+        .tech-avatar { width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; margin: 0 auto 12px; border: 3px solid #B76E79; }
+        .tech-info { margin-bottom: 1rem; }
+        .tech-name { font-size: 1.25rem; font-weight: 700; margin: 0; color: #2D3436; }
+        .tech-role { font-size: 0.9rem; color: #636e72; margin: 5px 0 1rem 0; }
+        .btn-details { background: #D4AF37; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        .btn-delete { background: #d63031; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        .btn-delete:hover { background: #c0392b; }
+        .btn-confirm-delete { background: #d63031 !important; }
+        .btn-confirm-delete:hover { background: #c0392b !important; }
+        .btn-cancel-delete:hover { background: #515a5a !important; }
+        
+        /* Log Section */
+        #log-results-container { background: #F8F9FA; border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+        #log-results-header { font-size: 1.25rem; font-weight: 600; color: #2D3436; margin-bottom: 1rem; border-bottom: 2px solid #E8D5D5; padding-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        thead { background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #E8D5D5; }
+        th { font-weight: 600; font-size: 0.95rem; }
+        td { color: #2D3436; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #F5E6E8; }
+        
+        .loading-message { color: #B76E79; font-weight: 500; }
+        .error-message { color: #d63031; font-weight: 600; }
+        .success-message { color: #B76E79; background: rgba(183, 110, 121, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .note { color: #636e72; font-size: 0.9rem; margin-bottom: 1.5rem; font-style: italic; }
+        
+        /* Grid Layout */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        
+        /* Navigation */
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
+        .nav-menu { list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0; }
+        .nav-menu a { color: #2D3436; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav-menu a:hover { color: #B76E79; }
+        .logo { font-size: 1.75rem; font-weight: 700; color: #B76E79; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .navbar { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-bottom: 1px solid #E8D5D5; position: sticky; top: 0; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">💅 NailReal <span>Admin</span></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">🏠 Dashboard</a></li>
+                <li><a href="services.html">💅 บริการ</a></li>
+                <li><a href="admin_panel.html">⚙️ Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>⚙️ Admin Panel - NailReal Shop</h1>
+        <p>เข้าสู่ระบบแอดมิน: จัดการข้อมูลช่าง และตรวจสอบ Log การจับเวลา</p>
+
+        <!-- 1. Technician Management -->
+        <section class="admin-section">
+            <h2>🧑‍🔧 การจัดการข้อมูลช่าง (Technician Management)</h2>
+
+            <h3>เพิ่มช่างใหม่</h3>
+            <form id="add-tech-form">
+                <input type="text" id="tech-name" placeholder="ชื่อช่าง (เช่น Aom)" required>
+                <input type="text" id="tech-profilepic" placeholder="Image Path (เช่น default_tech_a.jpg)">
+                <select id="tech-role" required>
+                    <option value="">-- ตำแหน่งงาน --</option>
+                    <option value="Senior Nail Tech">Senior Nail Tech</option>
+                    <option value="Nail Artist">Nail Artist</option>
+                    <option value="Cleaner">Cleaner</option>
+                </select>
+                <button type="submit">💾 เพิ่มช่าง</button>
+            </form>
+
+            <h3>รายชื่อช่างทั้งหมด</h3>
+            <div id="tech-list-container">
+                <!-- Tech Cards will be loaded here by JavaScript -->
+                <p class="loading-message">กำลังโหลดข้อมูลช่าง...</p>
+            </div>
+        </section>
+
+        <!-- 1.5 Technician History -->
+        <section class="admin-section">
+            <h2>📊 ประวัติการทำงานช่าง (Technician History)</h2>
+            <p class="note">คลิกที่ชื่อช่างเพื่อดูประวัติการทำงานทั้งหมด</p>
+            <div id="history-technician-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;"></div>
+        </section>
+        
+        <!-- 1.6 Recent Activity (Auto-Loading) -->
+        <section class="admin-section">
+            <h2>📋 ประวัติล่าสุด (Recent Activity)</h2>
+            <p class="note">แสดง 10 รายการล่าสุดที่เพิ่งบันทึก (อัปเดตอัตโนมัติ)</p>
+            <div id="recent-logs-container">
+                <p class="loading-message">กำลังโหลดประวัติล่าสุด...</p>
+            </div>
+            <button id="btn-refresh-recent" style="margin-top: 15px; background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white; border: none; padding: 12px 32px; border-radius: 8px; cursor: pointer; font-weight: 600;">🔄 รีเฟรช</button>
+        </section>
+
+        <!-- 2. Service Log Review -->
+        <section class="admin-section">
+            <h2>⏱️ การตรวจสอบ Log เวลาทำงาน (Service Time Logs)</h2>
+            <p class="note">กรุณาใส่ Appointment ID ที่ต้องการตรวจสอบเพื่อดูรายละเอียดการจับเวลา</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="log-appointment-id" placeholder="ใส่ Appointment ID ที่นี่ (เช่น APP123)" style="flex-grow: 1; padding: 12px 16px; border: 2px solid #E8D5D5; border-radius: 8px;">
+                <button id="btn-load-logs" style="background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white; border: none; padding: 12px 32px; border-radius: 8px; cursor: pointer; font-weight: 600;">🔍 ดู Log</button>
+            </div>
+            
+            <h3 id="log-results-header" style="display: none;">ผลการตรวจสอบ Log</h3>
+            <div id="log-results-container">
+                <p class="loading-message">ใส่ Appointment ID และกดปุ่มเพื่อดู Log ค่ะ</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="./admin_panel.js?v=2"></script>
+</body>
+</html>

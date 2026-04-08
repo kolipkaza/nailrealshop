@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard</title>
+</head>
+<body>
+    <h1>Test Dashboard Loading</h1>
+    <p>Total Services: <span id="total-services">Loading...</span></p>
+    <p>Total Customers: <span id="total-customers">Loading...</span></p>
+    <p>Today Appointments: <span id="today-appointments">Loading...</span></p>
+    
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        
+        async function loadDashboardStats() {
+            try {
+                console.log('Loading dashboard stats...');
+                
+                // Fetch services
+                const servicesRes = await fetch(`${API_URL}/services`);
+                const services = await servicesRes.json();
+                console.log('Services loaded:', services.length);
+                
+                // Fetch customers
+                const customersRes = await fetch(`${API_URL}/customers`);
+                const customers = await customersRes.json();
+                console.log('Customers loaded:', customers.length);
+                
+                // Fetch appointments
+                const appointmentsRes = await fetch(`${API_URL}/appointments`);
+                const appointments = await appointmentsRes.json();
+                console.log('Appointments loaded:', appointments.length);
+                
+                // Update stats
+                document.getElementById('total-services').textContent = services.length;
+                document.getElementById('total-customers').textContent = customers.length;
+                document.getElementById('today-appointments').textContent = appointments.length;
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                document.getElementById('total-services').textContent = 'Error';
+                document.getElementById('total-customers').textContent = 'Error';
+                document.getElementById('today-appointments').textContent = 'Error';
+            }
+        }
+        
+        // Initialize
+        loadDashboardStats();
+    </script>
+</body>
+</html>

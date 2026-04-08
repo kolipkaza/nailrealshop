@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดนัดหมาย - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        .detail-card h1 {
+            color: #B76E79;
+            border-bottom: 3px solid #D4AF37;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .detail-info p{
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            color: #2D3436;
+        }
+        .detail-info strong{
+            color: #B76E79;
+            font-weight: 600;
+        }
+        .btn-back{
+            display: inline-block;
+            background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn-back:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">💅 NailReal</a>
+            <ul class="nav-menu">
+                <li><a href="index.html">📊 Dashboard</a></li>
+                <li><a href="services.html">💅 บริการ</a></li>
+                <li><a href="appointments.html">📅 นัดหมาย</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="appointment-detail">
+            <div class="loading-message">กำลังโหลดข้อมูล...</div>
+        </div>
+    </div>
+
+    <script src="./appointment_detail.js"></script>
+</body>
+</html>

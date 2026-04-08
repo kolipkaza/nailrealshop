@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NailReal Shop - ระบบจัดการร้านทำเล็บ</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <!-- Navigation -->
@@ -12,10 +12,8 @@
         <div class="nav-container">
             <a href="#" class="logo">💅 NailReal</a>
             <ul class="nav-menu">
-                <li><a href="#dashboard">📊 Dashboard</a></li>
-                <li><a href="#appointments">📅 การนัดหมาย</a></li>
-                <li><a href="#customers">👥 ลูกค้า</a></li>
-                <li><a href="#services">💅 บริการ</a></li>
+                <li><a href="index.html">📊 Dashboard</a></li>
+                <li><a href="services.html">💅 บริการ</a></li>
             </ul>
         </div>
     </nav>
@@ -31,18 +29,30 @@
         <section id="dashboard">
             <h2 class="section-title">📊 Dashboard</h2>
             <div class="stats-grid">
-                <div class="stat-card">
+                <a href="appointments.html" class="stat-card" style="text-decoration: none; cursor: pointer;">
                     <h3>📅 การนัดหมายวันนี้</h3>
                     <p class="stat-number" id="today-appointments">0</p>
-                </div>
+                </a>
                 <div class="stat-card">
                     <h3>👥 ลูกค้าทั้งหมด</h3>
                     <p class="stat-number" id="total-customers">0</p>
                 </div>
-                <div class="stat-card">
+                <a href="services.html" class="stat-card" style="text-decoration: none; cursor: pointer;">
                     <h3>💅 บริการ</h3>
                     <p class="stat-number" id="total-services">0</p>
-                </div>
+                </a>
+                <a href="admin_panel.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white;">
+                    <h3>⚙️ Admin Panel</h3>
+                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">เข้าสู่ระบบแอดมิน</p>
+                </a>
+                <a href="admin_panel.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #D4AF37 0%, #B76E79 100%); color: white;">
+                    <h3>📊 Technician History</h3>
+                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ดูประวัติช่างทั้งหมด</p>
+                </a>
+                <a href="employee_dashboard.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #F8B4C2 0%, #FFC0CB 100%); color: white;">
+                    <h3>🧑‍💼 Employee Dashboard</h3>
+                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">เข้าสู่ระบบลูกจ้าง</p>
+                </a>
             </div>
         </section>
     </main>
@@ -52,6 +62,6 @@
         <p>&copy; 2026 NailReal Shop - ระบบจัดการร้านทำเล็บ</p>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="./app.js"></script>
 </body>
 </html>

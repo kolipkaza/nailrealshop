@@ -13,11 +13,16 @@
     "pm2:logs": "pm2 logs nailreal-shop"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^2.1.1"
   },
-  "keywords": ["nail", "salon", "management"],
+  "keywords": [
+    "nail",
+    "salon",
+    "management"
+  ],
   "author": "zhain",
   "license": "ISC"
 }

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บริการทั้งหมด - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Services Page Specific Styles - Rose Gold Theme */
+        .services-page { padding: 2rem 0; }
+        .services-section { margin-bottom: 3rem; }
+        .services-category { margin-bottom: 2rem; }
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #B76E79;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #F5E6E8;
+            cursor: pointer;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(183, 110, 121, 0.15);
+            border-color: #E8D5D5;
+        }
+        .service-image-container {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #F8F9FA 0%, #F5E6E8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .service-image { width: 100%; height: 100%; object-fit: cover; }
+        .service-image-placeholder {
+            text-align: center;
+            color: #636e72;
+        }
+        .service-image-placeholder .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .service-image-placeholder .slot-id {
+            font-size: 0.75rem;
+            background: rgba(183, 110, 121, 0.1);
+            color: #B76E79;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .service-card-content { padding: 1.5rem; }
+        .service-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .service-name { font-size: 1.2rem; font-weight: 700; color: #2D3436; margin: 0 0 0.5rem 0; }
+        .service-description {
+            font-size: 0.95rem;
+            color: #636e72;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .service-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #B76E79;
+        }
+        .service-duration {
+            font-size: 0.85rem;
+            color: #636e72;
+        }
+        .loading-message {
+            text-align: center;
+            padding: 3rem;
+            color: #B76E79;
+            font-size: 1.1rem;
+        }
+        .error-message {
+            text-align: center;
+            padding: 3rem;
+            color: #d63031;
+            font-size: 1.1rem;
+        }
+        .services-page h2 { color: #2D3436; border-left: 4px solid #B76E79; padding-left: 12px; margin-bottom: 2rem; }
+        .services-page h3 { color: #2D3436; margin-bottom: 1rem; }
+        .services-page p { color: #636e72; }
+        .services-page .services-grid { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">💅 NailReal <span>Services</span></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">🏠 Dashboard</a></li>
+                <li><a href="services.html">💅 บริการ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="services-page">
+        <h2>💅 บริการทั้งหมด</h2>
+        <p>รายการบริการที่เรามีให้ คลิกที่รายการเพื่อดูรายละเอียดเพิ่มเติม</p>
+
+        <!-- Loading State -->
+        <div id="loading-message" class="loading-message">กำลังโหลดข้อมูลบริการ...</div>
+
+        <!-- Error State -->
+        <div id="error-message" class="error-message" style="display: none;">
+            ❌ ไม่สามารถโหลดข้อมูลบริการได้
+            <p id="error-details" style="font-size: 0.9rem; margin-top: 10px;"></p>
+        </div>
+
+        <!-- Services Grid -->
+        <div id="services-grid" class="services-grid" style="display: none;"></div>
+    </div>
+
+    <script src="./services.js?v=2"></script>
+</body>
+</html>

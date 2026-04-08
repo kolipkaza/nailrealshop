@@ -1,7 +1,7 @@
 /* ============================================
-   NailReal Shop - Original Design
-   Apple.com + NailFashion inspired
-   Minimal, Clean, Elegant
+   NailReal Shop - Rose Gold Theme
+   Inspired by Lotus Nail Salon
+   Clean, Elegant, Modern
    ============================================ */
 
 /* Reset & Base */
@@ -12,39 +12,46 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: #fafafa;
-    color: #1d1d1f;
-    line-height: 1.5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #F8F9FA;
+    color: #2D3436;
+    line-height: 1.6;
 }
 
 /* Navigation */
 .navbar {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #E8D5D5;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.03);
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 48px;
+    height: 64px;
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1d1d1f;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #B76E79;
     text-decoration: none;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo span {
+    color: #D4AF37;
 }
 
 .nav-menu {
@@ -54,104 +61,221 @@ body {
 }
 
 .nav-menu a {
-    color: #1d1d1f;
+    color: #2D3436;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
     transition: color 0.3s ease;
+    position: relative;
 }
 
 .nav-menu a:hover {
-    color: #bf5af2; /* Nail polish purple */
+    color: #B76E79;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #B76E79, #D4AF37);
+    transition: width 0.3s ease;
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
 }
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #ff6b9d 0%, #bf5af2 50%, #5e5ce6 100%);
-    color: white;
-    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #E8D5D5 0%, #F5E6E8 50%, #FFF0F3 100%);
+    color: #2D3436;
+    padding: 5rem 2rem;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="rgba(183, 110, 121, 0.05)"/></svg>');
+    opacity: 0.5;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .hero-title {
-    font-size: 3rem;
-    font-weight: 600;
+    font-size: 3.5rem;
+    font-weight: 800;
     letter-spacing: -1px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    color: #B76E79;
 }
 
 .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     opacity: 0.9;
     font-weight: 300;
+    margin-bottom: 2rem;
+    color: #2D3436;
 }
 
 /* Container */
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
 }
 
 /* Section */
 .section-title {
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
     margin-bottom: 2rem;
     letter-spacing: -0.5px;
+    color: #2D3436;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #B76E79, #D4AF37);
+    border-radius: 2px;
 }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
-/* Stat Card */
 .stat-card {
     background: white;
+    border-radius: 16px;
     padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #F5E6E8;
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 30px rgba(183, 110, 121, 0.15);
+    border-color: #E8D5D5;
 }
 
 .stat-card h3 {
-    font-size: 0.9rem;
-    color: #86868b;
+    font-size: 1.1rem;
+    color: #636e72;
+    margin-bottom: 1rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .stat-number {
     font-size: 2.5rem;
-    font-weight: 600;
-    color: #bf5af2;
-    letter-spacing: -1px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-/* Footer */
-.footer {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 2rem;
-    text-align: center;
-    margin-top: 3rem;
+/* Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(183, 110, 121, 0.4);
+}
+
+.btn-secondary {
+    background: white;
+    color: #B76E79;
+    border: 2px solid #B76E79;
+}
+
+.btn-secondary:hover {
+    background: #E8D5D5;
+    color: #B76E79;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
+
+    .hero-subtitle {
+        font-size: 1.1rem;
     }
+
+    .nav-container {
+        padding: 0 1rem;
+    }
+
+    .nav-menu {
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+    }
+}
+/* Appointments Grid */
+.appointments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.appointment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(183, 110, 121, 0.15);
+    border-color: #B76E79;
+}
+
+.appointment-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
 }
