@@ -2,6 +2,8 @@
 let timerInterval = null;
 let currentTimerSeconds = 0;
 let isTimerRunning = false;
+let previousAppointmentId = null;
+let accumulatedSeconds = 0;
 
 // --- API Utility Functions ---
 
@@ -80,10 +82,16 @@ document.getElementById('btn-start-timer').addEventListener('click', async () =>
         document.getElementById('btn-stop-timer').disabled = false;
         document.getElementById('timer-status').textContent = '🟢 กำลังบันทึกเวลาทำงาน...';
 
-        currentTimerSeconds = 0;
+        // Continue from accumulated time if same appointment
+        if (previousAppointmentId === appId && accumulatedSeconds > 0) {
+            currentTimerSeconds = accumulatedSeconds;
+        } else {
+            currentTimerSeconds = 0;
+            accumulatedSeconds = 0;
+            previousAppointmentId = appId;
+        }
         updateTimerDisplay();
         timerInterval = setInterval(updateTimerDisplay, 1000);
-        alert('✅ เริ่มการจับเวลาทำงานเรียบร้อยแล้ว!');
 
     } catch (error) {
         console.error("Start Timer Error:", error);
@@ -111,20 +119,67 @@ document.getElementById('btn-stop-timer').addEventListener('click', async () => 
              throw new Error(result.error || 'Failed to stop timer API.');
         }
         
-        // 2. Reset UI & Timer
+        // 2. Save accumulated time & Reset UI
+        accumulatedSeconds = currentTimerSeconds;
         clearInterval(timerInterval);
         timerInterval = null;
         isTimerRunning = false;
         
         document.getElementById('btn-start-timer').disabled = false;
         document.getElementById('btn-stop-timer').disabled = true;
-        document.getElementById('timer-status').textContent = '--- หยุดแล้ว ---';
-        document.getElementById('timer-display').textContent = '00:00:00';
-        alert(`✅ หยุดการจับเวลาสำเร็จ! ${result.details.duration} บันทึกเข้าระบบเรียบร้อยแล้ว`);
+        document.getElementById('timer-status').textContent = '--- หยุดแล้ว (กดเริ่มใหม่เพื่อนับต่อ) ---';
+        // Keep displaying the accumulated time
+        // document.getElementById('timer-display').textContent = '00:00:00';
 
     } catch (error) {
         console.error("Stop Timer Error:", error);
         alert(`⚠️ เกิดข้อผิดพลาดในการหยุดจับเวลา: ${error.message}`);
+    }
+});
+
+// Close Job - mark appointment as completed and remove from queue
+document.getElementById('btn-close-job').addEventListener('click', async () => {
+    const appId = document.getElementById('employee-appointment').value;
+    if (!appId) {
+        alert('⚠️ กรุณาเลือกนัดหมายก่อน');
+        return;
+    }
+
+    if (!confirm(`ปิดงาน ${appId} และนำออกจากคิว?`)) return;
+
+    try {
+        // Stop timer if running
+        if (isTimerRunning) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            isTimerRunning = false;
+        }
+
+        // Mark appointment as completed
+        const res = await fetch(`/api/appointments/${appId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'completed' })
+        });
+
+        if (!res.ok) throw new Error('Failed to close job');
+
+        // Reset UI
+        currentTimerSeconds = 0;
+        accumulatedSeconds = 0;
+        previousAppointmentId = null;
+        document.getElementById('btn-start-timer').disabled = false;
+        document.getElementById('btn-stop-timer').disabled = true;
+        document.getElementById('timer-status').textContent = '--- ปิดงานแล้ว ---';
+        document.getElementById('timer-display').textContent = '00:00:00';
+
+        // Reload dropdowns
+        await loadAvailableAppointments();
+        await loadTodayQueue();
+
+    } catch (error) {
+        console.error('Close Job Error:', error);
+        alert(`⚠️ ปิดงานไม่สำเร็จ: ${error.message}`);
     }
 });
 
@@ -170,6 +225,28 @@ async function displayTodayQueue(appointments) {
     html += '</div>';
     queueContainer.innerHTML = html;
 }
+
+/** Reload just the appointments dropdown */
+async function loadAvailableAppointments() {
+    const apptRes = await fetch('/api/appointments?available=true');
+    const appointments = await apptRes.json();
+    populateSelect('employee-appointment', appointments, 'id', 'customerName');
+}
+
+/** Reload today's queue display */
+async function loadTodayQueue() {
+    const apptRes = await fetch('/api/appointments?available=true');
+    const appointments = await apptRes.json();
+    displayTodayQueue(appointments);
+}
+
+// Auto-refresh appointments every 30 seconds
+setInterval(() => {
+    if (!isTimerRunning) {
+        loadAvailableAppointments();
+        loadTodayQueue();
+    }
+}, 30000);
 
 // -----------------------------------------------------------------
 // Initialize Application

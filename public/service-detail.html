@@ -172,15 +172,8 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">💅 NailReal <span>Detail</span></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">🏠 Dashboard</a></li>
-                <li><a href="services.html">💅 บริการ</a></li>
-            </ul>
-        </div>
-    </nav>
+    <body>
+    <div class="main-wrapper">
 
     <div class="detail-page">
         <a href="services.html" class="back-button">← กลับไปหน้ารายการบริการ</a>
@@ -208,6 +201,7 @@
                 </div>
                 <div class="info-section">
                     <h2 id="service-title" class="service-title"></h2>
+                    <input type="text" id="service-title-input" class="service-title-input" style="display: none;">
                     <span id="service-category-badge" class="service-category-badge"></span>
                 </div>
             </div>
@@ -239,6 +233,7 @@
         </div>
     </div>
 
+    <script src="./sidebar.js"></script>
     <script src="./service-detail.js"></script>
 </body>
 </html>

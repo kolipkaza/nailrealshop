@@ -6,65 +6,117 @@
     <title>รายละเอียดนัดหมาย - NailReal Shop</title>
     <link rel="stylesheet" href="./style.css">
     <style>
+        .detail-page { padding: 2rem 0; }
+        .back-button {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin-bottom: 2rem; color: #8B7355; text-decoration: none;
+            font-weight: 500; transition: color 0.3s ease;
+        }
+        .back-button:hover { color: #C9A86C; }
         .detail-card {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            max-width: 600px;
-            margin: 2rem auto;
+            background: white; border-radius: 16px; padding: 2.5rem;
+            box-shadow: 0 4px 15px rgba(139, 115, 85, 0.08);
+            border: 1px solid #F0EBE3; max-width: 800px; margin: 0 auto;
         }
-        .detail-card h1 {
-            color: #B76E79;
-            border-bottom: 3px solid #D4AF37;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        .detail-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid #F0EBE3;
         }
-        .detail-info p{
-            margin: 1rem 0;
-            font-size: 1.1rem;
-            color: #2D3436;
+        .detail-title { font-size: 1.8rem; font-weight: 700; color: #3D3D3D; }
+        .detail-id { font-size: 0.85rem; color: #999; margin-top: 0.25rem; font-family: monospace; }
+        .status-badge {
+            display: inline-block; padding: 6px 16px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 600;
         }
-        .detail-info strong{
-            color: #B76E79;
-            font-weight: 600;
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-confirmed { background: #CCE5FF; color: #004085; }
+        .status-in-progress { background: #FFE8CC; color: #E65100; }
+        .status-completed { background: #D4EDDA; color: #155724; }
+        .status-cancelled { background: #F8D7DA; color: #721C24; }
+        .info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
         }
-        .btn-back{
-            display: inline-block;
-            background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: transform 0.2s;
+        .info-item label {
+            display: block; font-size: 0.8rem; font-weight: 600;
+            color: #7A7A7A; text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
         }
-        .btn-back:hover{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3);
+        .info-item .value { font-size: 1.1rem; color: #3D3D3D; font-weight: 500; }
+        .notes-section {
+            background: #FDF9F3; border-radius: 12px; padding: 1.5rem;
+            border-left: 4px solid #C9A86C; margin-bottom: 2rem;
         }
+        .notes-section label { font-size: 0.85rem; font-weight: 600; color: #8B7355; }
+        .notes-section p { margin-top: 0.5rem; color: #5A5A5A; line-height: 1.7; }
+        .status-actions {
+            display: flex; gap: 0.75rem; flex-wrap: wrap;
+            padding-top: 1.5rem; border-top: 2px solid #F0EBE3;
+        }
+        .loading-message { color: #8B7355; font-weight: 500; text-align: center; padding: 3rem; }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">💅 NailReal</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">📊 Dashboard</a></li>
-                <li><a href="services.html">💅 บริการ</a></li>
-                <li><a href="appointments.html">📅 นัดหมาย</a></li>
-            </ul>
-        </div>
-    </nav>
+    <body>
+    <div class="main-wrapper">
 
-    <div class="container">
-        <div id="appointment-detail">
-            <div class="loading-message">กำลังโหลดข้อมูล...</div>
+    <div class="detail-page">
+        <div class="container">
+            <a href="appointments.html" class="back-button">← กลับหน้ารายการนัดหมาย</a>
+
+            <div id="loading" class="loading-message">กำลังโหลดข้อมูล...</div>
+            <div id="error" style="display:none; text-align:center; padding:3rem;">
+                <p style="color:#d63031; font-weight:600;">❌ ไม่พบข้อมูลนัดหมาย</p>
+                <a href="appointments.html" class="btn btn-secondary" style="margin-top:1rem;">กลับหน้ารายการ</a>
+            </div>
+
+            <div id="detail-card" class="detail-card" style="display:none;">
+                <div class="detail-header">
+                    <div>
+                        <h2 id="service-name" class="detail-title"></h2>
+                        <p id="appt-id" class="detail-id"></p>
+                    </div>
+                    <span id="status-badge" class="status-badge"></span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>👤 ชื่อลูกค้า</label>
+                        <div id="customer-name" class="value"></div>
+                    </div>
+                    <div class="info-item">
+                        <label>📱 เบอร์โทร</label>
+                        <div id="customer-phone" class="value"></div>
+                    </div>
+                    <div class="info-item">
+                        <label>📅 วันที่</label>
+                        <div id="appt-date" class="value"></div>
+                    </div>
+                    <div class="info-item">
+                        <label>🕐 เวลา</label>
+                        <div id="appt-time" class="value"></div>
+                    </div>
+                    <div class="info-item">
+                        <label>💅 บริการ</label>
+                        <div id="service-detail" class="value"></div>
+                    </div>
+                    <div class="info-item">
+                        <label>💰 ราคา</label>
+                        <div id="service-price" class="value"></div>
+                    </div>
+                </div>
+
+                <div id="notes-section" class="notes-section" style="display:none;">
+                    <label>📝 หมายเหตุ</label>
+                    <p id="appt-notes"></p>
+                </div>
+
+                <div id="status-actions" class="status-actions"></div>
+            </div>
         </div>
     </div>
 
+    <script src="./sidebar.js"></script>
     <script src="./appointment_detail.js"></script>
 </body>
 </html>

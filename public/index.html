@@ -7,61 +7,83 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo">💅 NailReal</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">📊 Dashboard</a></li>
-                <li><a href="services.html">💅 บริการ</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <header class="hero">
-        <h1 class="hero-title">NailReal Shop</h1>
-        <p class="hero-subtitle">ระบบจัดการภายในร้านทำเล็บ</p>
-    </header>
-
-    <!-- Dashboard Section -->
-    <main class="container">
-        <section id="dashboard">
-            <h2 class="section-title">📊 Dashboard</h2>
-            <div class="stats-grid">
-                <a href="appointments.html" class="stat-card" style="text-decoration: none; cursor: pointer;">
-                    <h3>📅 การนัดหมายวันนี้</h3>
-                    <p class="stat-number" id="today-appointments">0</p>
-                </a>
-                <div class="stat-card">
-                    <h3>👥 ลูกค้าทั้งหมด</h3>
-                    <p class="stat-number" id="total-customers">0</p>
-                </div>
-                <a href="services.html" class="stat-card" style="text-decoration: none; cursor: pointer;">
-                    <h3>💅 บริการ</h3>
-                    <p class="stat-number" id="total-services">0</p>
-                </a>
-                <a href="admin_panel.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%); color: white;">
-                    <h3>⚙️ Admin Panel</h3>
-                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">เข้าสู่ระบบแอดมิน</p>
-                </a>
-                <a href="admin_panel.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #D4AF37 0%, #B76E79 100%); color: white;">
-                    <h3>📊 Technician History</h3>
-                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ดูประวัติช่างทั้งหมด</p>
-                </a>
-                <a href="employee_dashboard.html" class="stat-card" style="text-decoration: none; cursor: pointer; background: linear-gradient(135deg, #F8B4C2 0%, #FFC0CB 100%); color: white;">
-                    <h3>🧑‍💼 Employee Dashboard</h3>
-                    <p class="stat-number" style="background: white; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">เข้าสู่ระบบลูกจ้าง</p>
-                </a>
+    <!-- Main Content -->
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">Dashboard</h1>
+                <span class="topbar-date" id="topbarDate"></span>
             </div>
-        </section>
-    </main>
+            <div class="topbar-right">
+                <span class="topbar-time" id="topbarTime"></span>
+            </div>
+        </header>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 NailReal Shop - ระบบจัดการร้านทำเล็บ</p>
-    </footer>
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <!-- Summary Cards Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-info">
+                        <p class="stat-label">นัดหมายวันนี้</p>
+                        <p class="stat-number" id="today-appointments">-</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <p class="stat-label">กำลังให้บริการ</p>
+                        <p class="stat-number" id="in-progress">-</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <p class="stat-label">ลูกค้าทั้งหมด</p>
+                        <p class="stat-number" id="total-customers">-</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💅</div>
+                    <div class="stat-info">
+                        <p class="stat-label">บริการทั้งหมด</p>
+                        <p class="stat-number" id="total-services">-</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🧑‍💼</div>
+                    <div class="stat-info">
+                        <p class="stat-label">ช่างทั้งหมด</p>
+                        <p class="stat-number" id="total-technicians">-</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Two Column Layout -->
+            <div class="dashboard-grid">
+                <!-- Recent Appointments -->
+                <section class="dashboard-section">
+                    <h2 class="section-title-sm">📅 นัดหมายล่าสุด</h2>
+                    <div id="recent-appointments" class="mini-list">
+                        <p class="empty-msg">กำลังโหลด...</p>
+                    </div>
+                </section>
+
+                <!-- Recent Service Logs -->
+                <section class="dashboard-section">
+                    <h2 class="section-title-sm">📋 ประวัติล่าสุด</h2>
+                    <div id="recent-logs" class="mini-list">
+                        <p class="empty-msg">กำลังโหลด...</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="./sidebar.js"></script>
     <script src="./app.js"></script>
 </body>
 </html>

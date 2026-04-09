@@ -38,7 +38,7 @@ const upload = multer({
 // ============ Middleware ============
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Database Initialization ---
 // รอให้ db.js ถูกเรียกและพร้อมใช้งานก่อนถึงจะเริ่ม API
@@ -96,6 +96,31 @@ app.post('/api/customers', async (req, res) => {
   }
 });
 
+app.put('/api/customers/:id', async (req, res) => {
+  try {
+    const customers = await db.load('customers');
+    const index = customers.findIndex(c => c.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Customer not found' });
+    customers[index] = { ...customers[index], ...req.body, id: req.params.id };
+    await db.save('customers', customers);
+    res.json(customers[index]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/customers/:id', async (req, res) => {
+  try {
+    const customers = await db.load('customers');
+    const filtered = customers.filter(c => c.id !== req.params.id);
+    if (filtered.length === customers.length) return res.status(404).json({ error: 'Customer not found' });
+    await db.save('customers', filtered);
+    res.json({ success: true, message: 'Customer deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============ Appointments ============
 app.get('/api/appointments', async (req, res) => {
   try {
@@ -110,6 +135,8 @@ app.get('/api/appointments', async (req, res) => {
       
       const availableAppointments = appointments.filter(
         appt => !activeAppointments.includes(appt.id)
+          && appt.status !== 'completed'
+          && appt.status !== 'cancelled'
       );
       return res.json(availableAppointments);
     }
@@ -122,12 +149,36 @@ app.get('/api/appointments', async (req, res) => {
 
 app.post('/api/appointments', async (req, res) => {
   try {
-    // Validation
-    if (!req.body.customerId || !req.body.serviceId || !req.body.date) {
-      return res.status(400).json({ error: 'Missing required fields: customerId, serviceId, date' });
+    const { customerName, customerPhone, serviceId, date, time, notes } = req.body;
+    
+    // Validation - customerName and serviceId required
+    if (!customerName || !serviceId || !date) {
+      return res.status(400).json({ error: 'Missing required fields: customerName, serviceId, date' });
     }
     
-    const appointment = await db.add('appointments', req.body);
+    // Auto-generate appointment ID
+    const appointments = await db.load('appointments');
+    const maxNum = appointments.reduce((max, a) => {
+      const match = a.id && a.id.match(/APP(\d+)/);
+      return match ? Math.max(max, parseInt(match[1])) : max;
+    }, 0);
+    const newId = `APP${String(maxNum + 1).padStart(3, '0')}`;
+    
+    // Find service info
+    const services = await db.load('services');
+    const service = services.find(s => s.id === String(serviceId));
+    
+    const appointment = await db.add('appointments', {
+      id: newId,
+      customerName,
+      customerPhone: customerPhone || '',
+      serviceId: String(serviceId),
+      serviceName: service ? service.name : 'ไม่ระบุบริการ',
+      date,
+      time: time || '',
+      notes: notes || '',
+      status: 'pending'
+    });
     res.status(201).json(appointment);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -144,6 +195,30 @@ app.get('/api/appointments/:id', async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found' });
     }
     
+    res.json(appointment);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/appointments/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['pending', 'confirmed', 'in-progress', 'completed', 'cancelled'];
+    
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+    
+    const appointments = await db.load('appointments');
+    const appointment = appointments.find(a => a.id === req.params.id);
+    
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    
+    appointment.status = status;
+    await db.save('appointments', appointments);
     res.json(appointment);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -202,14 +277,43 @@ app.put('/api/services/:id', async (req, res) => {
   }
 });
 
-app.post('/api/services/:id/upload', upload.single('image'), (req, res) => {
+app.delete('/api/services/:id', async (req, res) => {
+  try {
+    const services = await db.load('services');
+    const filtered = services.filter(s => s.id !== req.params.id);
+    if (filtered.length === services.length) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    await db.save('services', filtered);
+    res.json({ success: true, message: 'Service deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/services/:id/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image uploaded' });
   }
+  const imagePath = `images/services/${req.file.filename}`;
+  
+  // Save image path to service record
+  try {
+    const services = await db.load('services');
+    const service = services.find(s => s.id === req.params.id);
+    if (service) {
+      service.image = imagePath;
+      await db.save('services', services);
+    }
+  } catch (err) {
+    console.error('Failed to save image path:', err);
+  }
+  
   res.json({ 
     success: true, 
     filename: req.file.filename,
-    path: `images/services/${req.file.filename}`
+    path: imagePath,
+    image: imagePath
   });
 });
 
@@ -353,12 +457,21 @@ app.get('/api/logs/technician/:technicianId', async (req, res) => {
         const enrichedLogs = filteredLogs.map(log => {
             const service = services.find(s => s.id === log.serviceId);
             const appointment = appointments.find(a => a.id === log.appointmentId);
-            const customer = appointment ? customers.find(c => c.id === appointment.customerId) : null;
+            // Try customerName from appointment first, then lookup by customerId
+            let customerName = 'N/A';
+            if (appointment) {
+                if (appointment.customerName) {
+                    customerName = appointment.customerName;
+                } else if (appointment.customerId) {
+                    const customer = customers.find(c => c.id === appointment.customerId);
+                    customerName = customer ? customer.name : 'N/A';
+                }
+            }
             
             return {
                 ...log,
                 serviceName: service ? service.name : 'N/A',
-                customerName: customer ? customer.name : 'N/A'
+                customerName
             };
         });
         

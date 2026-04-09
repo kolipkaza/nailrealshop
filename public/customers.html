@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการลูกค้า - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .customers-page { padding-top: 2rem; }
+        .customers-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #F0EBE3;
+        }
+        .customers-header h2 { margin: 0; font-size: 1.5rem; color: #3D3D3D; }
+        .customers-header p { margin: 0.3rem 0 0; color: #7A7A7A; font-size: 0.9rem; }
+        .search-box {
+            width: 100%; max-width: 400px; padding: 10px 16px; border: 1px solid #E8DFD5;
+            border-radius: 10px; font-size: 0.95rem; margin-bottom: 1.5rem;
+        }
+        .search-box:focus { outline: none; border-color: #C9A86C; box-shadow: 0 0 0 3px rgba(201,168,108,0.15); }
+        .customer-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(139,115,85,0.06); }
+        .customer-table th { background: #FDF9F3; padding: 1rem; text-align: left; font-weight: 600; color: #5A5A5A; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #E8DFD5; }
+        .customer-table td { padding: 0.8rem 1rem; border-bottom: 1px solid #F0EBE3; font-size: 0.92rem; }
+        .customer-table tr:hover { background: #FDF9F3; }
+        .customer-name { font-weight: 600; color: #3D3D3D; }
+        .customer-phone { color: #7A7A7A; }
+        .btn-sm { padding: 5px 12px; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 500; }
+        .btn-edit { background: #F5EFE6; color: #8B7355; }
+        .btn-edit:hover { background: #E8DFD5; }
+        .btn-del { background: #FDE8E8; color: #D63031; }
+        .btn-del:hover { background: #F8D0D0; }
+        .actions-cell { display: flex; gap: 0.4rem; }
+        .empty-state { text-align: center; padding: 3rem; color: #B0B0B0; }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+    <div class="container customers-page">
+        <div class="customers-header">
+            <div>
+                <h2>👥 จัดการลูกค้า</h2>
+                <p>ค้นหา เพิ่ม แก้ไข ลบ ข้อมูลลูกค้า</p>
+            </div>
+            <button onclick="openAddCustomerModal()" class="btn btn-primary" style="padding:10px 24px;">➕ เพิ่มลูกค้า</button>
+        </div>
+
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 ค้นหาชื่อ, เบอร์โทร, อีเมล..." oninput="filterCustomers()">
+
+        <table class="customer-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ชื่อ</th>
+                    <th>เบอร์โทร</th>
+                    <th>อีเมล</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="customer-list">
+                <tr><td colspan="5" class="empty-state">กำลังโหลด...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div id="customerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:16px; padding:2rem; width:90%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <h3 id="modalTitle" style="margin-bottom:1.5rem; font-size:1.2rem;">➕ เพิ่มลูกค้าใหม่</h3>
+            <input type="hidden" id="editCustomerId" value="">
+            <div class="form-group">
+                <label class="form-label">ชื่อ-นามสกุล *</label>
+                <input class="form-input" id="cust-name" placeholder="สมศรี รักสวย" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">เบอร์โทร *</label>
+                <input class="form-input" id="cust-phone" placeholder="081-234-5678" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">อีเมล</label>
+                <input class="form-input" id="cust-email" type="email" placeholder="example@mail.com" />
+            </div>
+            <div id="modal-error" style="color:#d63031; font-size:0.85rem; margin-bottom:0.8rem; display:none;"></div>
+            <div style="display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
+                <button onclick="closeModal()" style="padding:10px 20px; border:1px solid #E8DFD5; background:white; border-radius:8px; cursor:pointer;">ยกเลิก</button>
+                <button onclick="saveCustomer()" class="btn btn-primary" style="padding:10px 24px; border-radius:8px;">✅ บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./sidebar.js"></script>
+    <script src="./customers.js"></script>
+</body>
+</html>

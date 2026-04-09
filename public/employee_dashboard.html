@@ -58,18 +58,9 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">💅 NailReal <span>Employee</span></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">🏠 Dashboard</a></li>
-                <li><a href="services.html">💅 บริการ</a></li>
-                <li><a href="admin_panel.html">⚙️ Admin</a></li>
-            </ul>
-        </div>
-    </nav>
+    <div class="main-wrapper">
 
-    <div class="container">
+    <div class="container" style="padding-top:2rem;">
         <h1>🧑‍💼 Employee Workstation Dashboard</h1>
         <p>ยินดีต้อนรับค่ะ ระบบนี้ใช้สำหรับพนักงานเพื่อดูคิวและบันทึกเวลาทำงานจริง</p>
 
@@ -95,9 +86,10 @@
                     <label for="employee-service">บริการ:</label>
                     <select id="employee-service" required></select>
                 </div>
-                <div style="margin-top: 20px;">
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                     <button id="btn-start-timer">▶️ เริ่มจับเวลา</button>
                     <button id="btn-stop-timer" disabled>⏹️ หยุดจับเวลา</button>
+                    <button id="btn-close-job" style="background: linear-gradient(135deg, #8B7355 0%, #C9A86C 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">✅ ปิดงาน</button>
                 </div>
             </div>
         </section>
@@ -123,6 +115,7 @@
         </section>
     </div>
 
+    <script src="./sidebar.js"></script>
     <script src="./employee_dashboard.js?v=2"></script>
 </body>
 </html>

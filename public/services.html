@@ -99,20 +99,17 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">💅 NailReal <span>Services</span></a>
-            <ul class="nav-menu">
-                <li><a href="index.html">🏠 Dashboard</a></li>
-                <li><a href="services.html">💅 บริการ</a></li>
-            </ul>
+    <div class="main-wrapper">
+    <div class="services-page container" style="padding-top:2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2 style="margin-bottom: 0.3rem;">💅 บริการทั้งหมด</h2>
+                <p>คลิกที่รายการเพื่อดูรายละเอียด หรือกดปุ่มด้านล่างเพื่อเพิ่มบริการใหม่</p>
+            </div>
+            <button onclick="openAddModal()" style="padding: 10px 24px; background: #8B7355; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: 600;">
+                ➕ เพิ่มบริการ
+            </button>
         </div>
-    </nav>
-
-    <div class="services-page">
-        <h2>💅 บริการทั้งหมด</h2>
-        <p>รายการบริการที่เรามีให้ คลิกที่รายการเพื่อดูรายละเอียดเพิ่มเติม</p>
 
         <!-- Loading State -->
         <div id="loading-message" class="loading-message">กำลังโหลดข้อมูลบริการ...</div>
@@ -127,6 +124,54 @@
         <div id="services-grid" class="services-grid" style="display: none;"></div>
     </div>
 
-    <script src="./services.js?v=2"></script>
+    <!-- Add Service Modal -->
+    <div id="addModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:16px; padding:2rem; width:90%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <h3 style="margin-bottom:1.5rem; font-size:1.3rem;">➕ เพิ่มบริการใหม่</h3>
+            <div class="form-group">
+                <label class="form-label">ชื่อบริการ *</label>
+                <input class="form-input" id="add-name" placeholder="เช่น แมนิคิวเจล" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">รายละเอียด</label>
+                <textarea class="form-input" id="add-desc" rows="3" placeholder="คำอธิบายบริการ"></textarea>
+            </div>
+            <div style="display:flex; gap:1rem;">
+                <div class="form-group" style="flex:1;">
+                    <label class="form-label">ราคา (฿) *</label>
+                    <input class="form-input" id="add-price" type="number" placeholder="500" />
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label class="form-label">ระยะเวลา (นาที) *</label>
+                    <input class="form-input" id="add-duration" type="number" placeholder="60" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">หมวดหมู่</label>
+                <select class="form-select" id="add-category">
+                    <option value="basic">Basic - พื้นฐาน</option>
+                    <option value="gel">Gel - เจล</option>
+                    <option value="extensions">Extensions - ต่อเล็บ</option>
+                    <option value="art">Art - ลายเล็บ</option>
+                    <option value="spa">Spa - สปา</option>
+                    <option value="lashes">Lashes - ขนตา</option>
+                    <option value="repair">Repair - ซ่อมเล็บ</option>
+                    <option value="package">Package - แพ็คเกจ</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ไอคอน</label>
+                <input class="form-input" id="add-icon" placeholder="💅" maxlength="4" />
+            </div>
+            <div id="add-error" style="color:#d63031; font-size:0.85rem; margin-bottom:0.8rem; display:none;"></div>
+            <div style="display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
+                <button onclick="closeAddModal()" style="padding:10px 20px; border:1px solid #E8DFD5; background:white; border-radius:8px; cursor:pointer; font-size:0.9rem;">ยกเลิก</button>
+                <button onclick="submitAddService()" style="padding:10px 24px; background:#8B7355; color:white; border:none; border-radius:8px; cursor:pointer; font-size:0.9rem; font-weight:600;">✅ เพิ่มบริการ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./sidebar.js"></script>
+    <script src="./services.js?v=3"></script>
 </body>
 </html>
