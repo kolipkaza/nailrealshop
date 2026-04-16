@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // Thai date/time helper
 class THAINow {
@@ -34,12 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
 async function loadDashboardStats() {
     try {
-        const [servicesRes, customersRes, appointmentsRes, techsRes, logsRes] = await Promise.all([
+        const [servicesRes, customersRes, appointmentsRes, techsRes, logsRes, txnSummaryRes] = await Promise.all([
             fetch(`${API_URL}/services`).catch(() => ({ json: () => [] })),
             fetch(`${API_URL}/customers`).catch(() => ({ json: () => [] })),
             fetch(`${API_URL}/appointments`).catch(() => ({ json: () => [] })),
             fetch(`${API_URL}/technicians`).catch(() => ({ json: () => [] })),
             fetch(`${API_URL}/logs/recent`).catch(() => ({ json: () => [] })),
+            fetch(`${API_URL}/transactions/summary`).catch(() => ({ json: () => ({}) })),
         ]);
 
         const services = await servicesRes.json();
@@ -47,14 +48,19 @@ async function loadDashboardStats() {
         const appointments = await appointmentsRes.json();
         const technicians = await techsRes.json();
         const logs = await logsRes.json();
+        const txnSummary = await txnSummaryRes.json();
 
         // Stat numbers
         setText('total-services', services.length);
         setText('total-customers', customers.length);
         setText('total-technicians', Array.isArray(technicians) ? technicians.length : 0);
 
-        // Today's appointments
+        // Today's revenue
         const today = new Date().toISOString().split('T')[0];
+        const todayRevenue = (txnSummary.byDate && txnSummary.byDate[today]) || 0;
+        setText('today-revenue', `฿${todayRevenue.toLocaleString()}`);
+
+        // Today's appointments
         const todayAppts = Array.isArray(appointments)
             ? appointments.filter(a => a.date === today || a.date === 'today')
             : [];

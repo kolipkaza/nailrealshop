@@ -54,20 +54,42 @@ app.get('/api', (req, res) => {
     version: '1.0.0',
     status: 'running',
     endpoints: [
+      'GET /api',
       'GET /api/customers',
       'POST /api/customers',
+      'PUT /api/customers/:id',
+      'DELETE /api/customers/:id',
       'GET /api/appointments',
       'POST /api/appointments',
+      'GET /api/appointments/:id',
+      'PATCH /api/appointments/:id/status',
+      'DELETE /api/appointments/:id',
       'GET /api/services',
       'POST /api/services',
+      'GET /api/services/:id',
       'PUT /api/services/:id',
+      'DELETE /api/services/:id',
       'POST /api/services/:id/upload',
       'GET /api/technicians',
       'POST /api/technicians',
+      'DELETE /api/technicians/:techId',
+      'GET /api/transactions',
+      'GET /api/transactions/summary',
+      'POST /api/transactions',
+      'GET /api/transactions/:id',
+      'PUT /api/transactions/:id',
+      'PATCH /api/transactions/:id/status',
+      'DELETE /api/transactions/:id',
+      'GET /api/reports/daily',
+      'GET /api/reports/monthly',
+      'GET /api/reports/services',
+      'GET /api/reports/customers',
+      'GET /api/reports/technicians',
+      'GET /api/logs/recent',
       'GET /api/logs/appointment/:appointmentId',
+      'GET /api/logs/technician/:technicianId',
       'POST /api/employee/timer/start',
-      'POST /api/employee/timer/stop',
-      'GET /api/logs/recent'
+      'POST /api/employee/timer/stop'
     ]
   });
 });
@@ -87,6 +109,13 @@ app.post('/api/customers', async (req, res) => {
     // Validation
     if (!req.body.name) {
       return res.status(400).json({ error: 'Missing required field: name' });
+    }
+    // Phone validation (Thai format: 0xx-xxx-xxxx or 0xxxxxxxxx)
+    if (req.body.phone) {
+      const phoneClean = req.body.phone.replace(/[\s\-]/g, '');
+      if (!/^0[0-9]{8,9}$/.test(phoneClean)) {
+        return res.status(400).json({ error: 'Invalid phone number format' });
+      }
     }
     
     const customer = await db.add('customers', req.body);
@@ -155,6 +184,13 @@ app.post('/api/appointments', async (req, res) => {
     if (!customerName || !serviceId || !date) {
       return res.status(400).json({ error: 'Missing required fields: customerName, serviceId, date' });
     }
+    // Phone validation (Thai format)
+    if (customerPhone) {
+      const phoneClean = customerPhone.replace(/[\s\-]/g, '');
+      if (!/^0[0-9]{8,9}$/.test(phoneClean)) {
+        return res.status(400).json({ error: 'Invalid phone number format' });
+      }
+    }
     
     // Auto-generate appointment ID
     const appointments = await db.load('appointments');
@@ -196,6 +232,21 @@ app.get('/api/appointments/:id', async (req, res) => {
     }
     
     res.json(appointment);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE appointment
+app.delete('/api/appointments/:id', async (req, res) => {
+  try {
+    const appointments = await db.load('appointments');
+    const filtered = appointments.filter(a => a.id !== req.params.id);
+    if (filtered.length === appointments.length) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    await db.save('appointments', filtered);
+    res.json({ success: true, message: 'Appointment deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -529,6 +580,272 @@ app.post('/api/employee/timer/stop', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to stop timer and save logs: ' + error.message });
     }
+});
+
+// ============ Transactions ============
+app.get('/api/transactions', async (req, res) => {
+  try {
+    let transactions = await db.load('transactions');
+    // Optional filters
+    if (req.query.status) {
+      transactions = transactions.filter(t => t.status === req.query.status);
+    }
+    if (req.query.dateFrom) {
+      transactions = transactions.filter(t => t.createdAt >= req.query.dateFrom);
+    }
+    if (req.query.dateTo) {
+      transactions = transactions.filter(t => t.createdAt <= req.query.dateTo + 'T23:59:59.999Z');
+    }
+    res.json(transactions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/transactions/summary', async (req, res) => {
+  try {
+    const transactions = await db.load('transactions');
+    const paid = transactions.filter(t => t.status === 'paid');
+    const totalRevenue = paid.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const byPaymentMethod = {};
+    paid.forEach(t => {
+      byPaymentMethod[t.paymentMethod] = (byPaymentMethod[t.paymentMethod] || 0) + (t.totalAmount || 0);
+    });
+    const byDate = {};
+    paid.forEach(t => {
+      const date = (t.createdAt || '').split('T')[0];
+      byDate[date] = (byDate[date] || 0) + (t.totalAmount || 0);
+    });
+    res.json({
+      totalTransactions: transactions.length,
+      totalRevenue,
+      paidCount: paid.length,
+      pendingCount: transactions.filter(t => t.status === 'pending').length,
+      refundedCount: transactions.filter(t => t.status === 'refunded').length,
+      byPaymentMethod,
+      byDate
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/transactions/:id', async (req, res) => {
+  try {
+    const transaction = await db.getById('transactions', req.params.id);
+    if (!transaction) return res.status(404).json({ error: 'Transaction not found' });
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/transactions', async (req, res) => {
+  try {
+    const { appointmentId, customerId, items, paymentMethod, status, discount, notes } = req.body;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Missing required field: items (array)' });
+    }
+    // Auto-calculate totalAmount from items
+    const subtotal = items.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
+    const discountAmount = discount || 0;
+    const totalAmount = Math.max(0, subtotal - discountAmount);
+    const transaction = await db.add('transactions', {
+      appointmentId: appointmentId || '',
+      customerId: customerId || '',
+      items,
+      subtotal,
+      discount: discountAmount,
+      totalAmount,
+      paymentMethod: paymentMethod || 'cash',
+      status: status || 'pending',
+      notes: notes || ''
+    });
+    res.status(201).json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/transactions/:id', async (req, res) => {
+  try {
+    const transactions = await db.load('transactions');
+    const index = transactions.findIndex(t => t.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Transaction not found' });
+    transactions[index] = { ...transactions[index], ...req.body, id: req.params.id };
+    await db.save('transactions', transactions);
+    res.json(transactions[index]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.patch('/api/transactions/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const validStatuses = ['pending', 'paid', 'refunded'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+    }
+    const transactions = await db.load('transactions');
+    const transaction = transactions.find(t => t.id === req.params.id);
+    if (!transaction) return res.status(404).json({ error: 'Transaction not found' });
+    transaction.status = status;
+    await db.save('transactions', transactions);
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/transactions/:id', async (req, res) => {
+  try {
+    const transactions = await db.load('transactions');
+    const filtered = transactions.filter(t => t.id !== req.params.id);
+    if (filtered.length === transactions.length) return res.status(404).json({ error: 'Transaction not found' });
+    await db.save('transactions', filtered);
+    res.json({ success: true, message: 'Transaction deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============ Reports ============
+app.get('/api/reports/daily', async (req, res) => {
+  try {
+    const date = req.query.date || new Date().toISOString().split('T')[0];
+    const appointments = await db.load('appointments');
+    const transactions = await db.load('transactions');
+    const dayAppts = appointments.filter(a => a.date === date);
+    const dayTxns = transactions.filter(t => t.status === 'paid' && (t.createdAt || '').startsWith(date));
+    const revenue = dayTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const services = await db.load('services');
+    const serviceBreakdown = {};
+    dayTxns.forEach(t => {
+      (t.items || []).forEach(item => {
+        serviceBreakdown[item.serviceName || item.serviceId] = (serviceBreakdown[item.serviceName || item.serviceId] || 0) + (item.price * (item.qty || 1));
+      });
+    });
+    res.json({
+      date,
+      appointmentsCount: dayAppts.length,
+      completedCount: dayAppts.filter(a => a.status === 'completed').length,
+      revenue,
+      transactionsCount: dayTxns.length,
+      serviceBreakdown
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/monthly', async (req, res) => {
+  try {
+    const month = req.query.month || new Date().toISOString().slice(0, 7);
+    const appointments = await db.load('appointments');
+    const transactions = await db.load('transactions');
+    const monthAppts = appointments.filter(a => a.date && a.date.startsWith(month));
+    const monthTxns = transactions.filter(t => t.status === 'paid' && (t.createdAt || '').startsWith(month));
+    const revenue = monthTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const dailyRevenue = {};
+    monthTxns.forEach(t => {
+      const day = (t.createdAt || '').split('T')[0];
+      dailyRevenue[day] = (dailyRevenue[day] || 0) + (t.totalAmount || 0);
+    });
+    res.json({
+      month,
+      appointmentsCount: monthAppts.length,
+      completedCount: monthAppts.filter(a => a.status === 'completed').length,
+      revenue,
+      transactionsCount: monthTxns.length,
+      dailyRevenue
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/services', async (req, res) => {
+  try {
+    const transactions = await db.load('transactions');
+    const ranking = {};
+    transactions.filter(t => t.status === 'paid').forEach(t => {
+      (t.items || []).forEach(item => {
+        const key = item.serviceName || item.serviceId || 'unknown';
+        if (!ranking[key]) ranking[key] = { name: key, count: 0, revenue: 0 };
+        ranking[key].count += (item.qty || 1);
+        ranking[key].revenue += (item.price * (item.qty || 1));
+      });
+    });
+    const sorted = Object.values(ranking).sort((a, b) => b.count - a.count);
+    res.json(sorted);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/customers', async (req, res) => {
+  try {
+    const transactions = await db.load('transactions');
+    const customersMap = {};
+    transactions.filter(t => t.status === 'paid').forEach(t => {
+      const key = t.customerId || 'unknown';
+      if (!customersMap[key]) customersMap[key] = { customerId: key, visits: 0, totalSpent: 0 };
+      customersMap[key].visits++;
+      customersMap[key].totalSpent += (t.totalAmount || 0);
+    });
+    // Enrich with customer names
+    const customers = await db.load('customers');
+    const result = Object.values(customersMap).map(c => {
+      const cust = customers.find(cu => cu.id === c.customerId);
+      return { ...c, name: cust ? cust.name : c.customerId };
+    }).sort((a, b) => b.totalSpent - a.totalSpent);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/reports/technicians', async (req, res) => {
+  try {
+    const logs = await db.load('service_logs');
+    const finishedLogs = logs.filter(l => l.isFinished);
+    const techMap = {};
+    finishedLogs.forEach(l => {
+      const key = l.technicianId || 'unknown';
+      if (!techMap[key]) techMap[key] = { technicianId: key, jobsDone: 0, totalSeconds: 0, revenue: 0 };
+      techMap[key].jobsDone++;
+      techMap[key].totalSeconds += (l.durationSeconds || 0);
+    });
+    // Enrich with tech names and calculate revenue from transactions
+    const technicians = await db.load('technicians');
+    const transactions = await db.load('transactions');
+    const appointments = await db.load('appointments');
+
+    // Build a map of appointmentId -> technicianId from logs
+    const apptTechMap = {};
+    finishedLogs.forEach(l => {
+      apptTechMap[l.appointmentId] = l.technicianId;
+    });
+
+    // Calculate revenue from paid transactions linked to technicians via appointments
+    transactions.filter(t => t.status === 'paid').forEach(txn => {
+      if (txn.appointmentId && apptTechMap[txn.appointmentId]) {
+        const techId = apptTechMap[txn.appointmentId];
+        if (techMap[techId]) {
+          techMap[techId].revenue += (txn.totalAmount || 0);
+        }
+      }
+    });
+
+    const result = Object.values(techMap).map(t => {
+      const tech = technicians.find(tc => tc.techId === t.technicianId);
+      return { ...t, name: tech ? tech.name : t.technicianId };
+    }).sort((a, b) => b.jobsDone - a.jobsDone);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ============ Start Server ============

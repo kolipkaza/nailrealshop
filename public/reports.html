@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงาน - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .report-tabs {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 10px 20px; border-radius: 20px; border: 1px solid #E8DFD5;
+            background: white; color: #5A5A5A; font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .tab-btn:hover { border-color: #C9A86C; color: #8B7355; }
+        .tab-btn.active { background: #8B7355; color: white; border-color: #8B7355; }
+        .report-card {
+            background: white; border-radius: 16px; padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(139,115,85,0.06); margin-bottom: 1rem;
+        }
+        .report-card h3 { font-size: 1.1rem; color: #3D3D3D; margin-bottom: 0.75rem; }
+        .stat-row {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .stat-box {
+            flex: 1; min-width: 140px; padding: 1rem; background: #FAF7F2;
+            border-radius: 12px; text-align: center;
+        }
+        .stat-box .stat-value { font-size: 1.5rem; font-weight: 700; color: #8B7355; }
+        .stat-box .stat-label { font-size: 0.8rem; color: #7A7A7A; margin-top: 0.25rem; }
+        .bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+        .bar-row { display: flex; align-items: center; gap: 0.5rem; }
+        .bar-label { width: 120px; font-size: 0.85rem; color: #5A5A5A; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-track { flex: 1; height: 24px; background: #F0EBE3; border-radius: 12px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #C9A86C, #8B7355); border-radius: 12px; transition: width 0.5s; display: flex; align-items: center; padding-left: 8px; font-size: 0.75rem; color: white; font-weight: 600; }
+        .date-controls {
+            display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;
+        }
+        .date-controls input {
+            padding: 8px 14px; border: 1px solid #E8DFD5; border-radius: 10px; font-size: 0.9rem;
+        }
+        .date-controls input:focus { outline: none; border-color: #C9A86C; }
+        .report-section { display: none; }
+        .report-section.active { display: block; }
+        .export-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">📊 รายงาน</h1>
+            </div>
+        </header>
+        <main class="container">
+            <!-- Tabs -->
+            <div class="report-tabs">
+                <button class="tab-btn active" data-tab="daily">📅 รายวัน</button>
+                <button class="tab-btn" data-tab="monthly">📆 รายเดือน</button>
+                <button class="tab-btn" data-tab="services">💅 บริการยอดนิยม</button>
+                <button class="tab-btn" data-tab="customers">👥 ลูกค้าท็อป</button>
+                <button class="tab-btn" data-tab="technicians">🧑‍💼 ช่าง</button>
+            </div>
+
+            <!-- Export placeholder -->
+            <div class="export-bar">
+                <button class="btn btn-secondary" onclick="alert('Export จะพร้อมใช้งานเร็วๆ นี้')">📥 Export CSV</button>
+                <button class="btn btn-secondary" onclick="alert('Export จะพร้อมใช้งานเร็วๆ นี้')">📄 Export PDF</button>
+            </div>
+
+            <!-- Daily -->
+            <div class="report-section active" id="sec-daily">
+                <div class="date-controls">
+                    <label>📅 เลือกวัน:</label>
+                    <input type="date" id="dailyDate">
+                    <button class="btn btn-primary" onclick="loadDaily()">ดูรายงาน</button>
+                </div>
+                <div id="dailyContent"><p style="color:#7A7A7A;">เลือกวันแล้วกด "ดูรายงาน"</p></div>
+            </div>
+
+            <!-- Monthly -->
+            <div class="report-section" id="sec-monthly">
+                <div class="date-controls">
+                    <label>📆 เลือกเดือน:</label>
+                    <input type="month" id="monthlyMonth">
+                    <button class="btn btn-primary" onclick="loadMonthly()">ดูรายงาน</button>
+                </div>
+                <div id="monthlyContent"><p style="color:#7A7A7A;">เลือกเดือนแล้วกด "ดูรายงาน"</p></div>
+            </div>
+
+            <!-- Services -->
+            <div class="report-section" id="sec-services">
+                <div id="servicesContent"><p style="color:#7A7A7A;">กำลังโหลด...</p></div>
+            </div>
+
+            <!-- Customers -->
+            <div class="report-section" id="sec-customers">
+                <div id="customersContent"><p style="color:#7A7A7A;">กำลังโหลด...</p></div>
+            </div>
+
+            <!-- Technicians -->
+            <div class="report-section" id="sec-technicians">
+                <div id="techniciansContent"><p style="color:#7A7A7A;">กำลังโหลด...</p></div>
+            </div>
+        </main>
+    </div>
+    <script src="./sidebar.js"></script>
+    <script src="./reports.js"></script>
+</body>
+</html>

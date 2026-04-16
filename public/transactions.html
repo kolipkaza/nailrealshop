@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการเงิน - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .filter-bar {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .filter-btn {
+            padding: 8px 18px; border-radius: 20px; border: 1px solid #E8DFD5;
+            background: white; color: #5A5A5A; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .filter-btn:hover { border-color: #C9A86C; color: #8B7355; }
+        .filter-btn.active { background: #8B7355; color: white; border-color: #8B7355; }
+        .search-bar {
+            display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+        }
+        .search-bar input, .search-bar select {
+            padding: 8px 14px; border: 1px solid #E8DFD5; border-radius: 10px;
+            font-size: 0.9rem; color: #3D3D3D;
+        }
+        .search-bar input:focus, .search-bar select:focus {
+            outline: none; border-color: #C9A86C; box-shadow: 0 0 0 3px rgba(201,168,108,0.15);
+        }
+        .txn-table {
+            width: 100%; border-collapse: collapse; background: white;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(139,115,85,0.06);
+        }
+        .txn-table th {
+            background: #F5EFE6; color: #8B7355; padding: 12px 16px;
+            text-align: left; font-size: 0.85rem; font-weight: 600;
+        }
+        .txn-table td {
+            padding: 10px 16px; border-bottom: 1px solid #F0EBE3; font-size: 0.9rem;
+        }
+        .txn-table tr:hover { background: #FAF7F2; }
+        .status-paid { color: #155724; background: #D4EDDA; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+        .status-pending { color: #856404; background: #FFF3CD; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+        .status-refunded { color: #721C24; background: #F8D7DA; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; }
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 600px;
+            max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .modal h3 { font-size: 1.2rem; color: #3D3D3D; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 0.75rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5A5A5A; margin-bottom: 0.3rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #E8DFD5; border-radius: 10px;
+            font-size: 0.95rem; color: #3D3D3D;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #C9A86C; box-shadow: 0 0 0 3px rgba(201,168,108,0.15);
+        }
+        .item-row {
+            display: grid; grid-template-columns: 2fr 1fr 1fr 40px; gap: 0.5rem;
+            align-items: center; margin-bottom: 0.5rem;
+        }
+        .item-row input { padding: 8px 10px; border: 1px solid #E8DFD5; border-radius: 8px; font-size: 0.85rem; }
+        .total-row { text-align: right; font-size: 1.1rem; font-weight: 700; color: #8B7355; margin: 1rem 0; }
+        .btn-sm { padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; cursor: pointer; border: none; }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">💰 ระบบการเงิน</h1>
+            </div>
+        </header>
+        <main class="container">
+            <!-- Search & Filter -->
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 ค้นหา...">
+                <input type="date" id="dateFrom">
+                <input type="date" id="dateTo">
+                <select id="statusFilter">
+                    <option value="">ทุกสถานะ</option>
+                    <option value="pending">⏳ รอชำระ</option>
+                    <option value="paid">✅ ชำระแล้ว</option>
+                    <option value="refunded">🔄 คืนเงิน</option>
+                </select>
+                <button class="btn btn-primary" onclick="openModal()">➕ สร้างรายการ</button>
+            </div>
+            <!-- Table -->
+            <table class="txn-table">
+                <thead>
+                    <tr>
+                        <th>วันที่</th>
+                        <th>ลูกค้า</th>
+                        <th>รายการ</th>
+                        <th>ยอดรวม</th>
+                        <th>วิธีชำระ</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="txnBody">
+                    <tr><td colspan="7" style="text-align:center;color:#7A7A7A;">กำลังโหลด...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="txnModal">
+        <div class="modal">
+            <h3 id="modalTitle">➕ สร้างรายการใหม่</h3>
+            <form id="txnForm">
+                <input type="hidden" id="txnId">
+                <div class="form-group">
+                    <label>👤 ลูกค้า</label>
+                    <select id="customerId">
+                        <option value="">-- เลือกลูกค้า --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📅 นัดหมาย</label>
+                    <select id="appointmentId">
+                        <option value="">-- เลือกนัดหมาย --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>💅 รายการบริการ</label>
+                    <div id="itemsContainer"></div>
+                    <button type="button" class="btn-sm btn btn-secondary" onclick="addItemRow()">➕ เพิ่มรายการ</button>
+                </div>
+                <div class="form-group">
+                    <label>🏷️ ส่วนลด (฿)</label>
+                    <input type="number" id="discount" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>💳 วิธีชำระเงิน</label>
+                    <select id="paymentMethod">
+                        <option value="cash">💵 เงินสด</option>
+                        <option value="transfer">🏦 โอนเงิน</option>
+                        <option value="credit">💳 เครดิต</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📝 หมายเหตุ</label>
+                    <textarea id="notes" rows="2" placeholder="หมายเหตุ..."></textarea>
+                </div>
+                <div class="total-row">ยอดรวม: ฿<span id="totalDisplay">0</span></div>
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./sidebar.js"></script>
+    <script src="./transactions.js"></script>
+</body>
+</html>

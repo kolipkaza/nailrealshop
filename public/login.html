@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - NailReal Shop</title>
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .login-wrapper {
+            display: flex; justify-content: center; align-items: center;
+            min-height: 80vh; padding: 2rem;
+        }
+        .login-card {
+            background: white; border-radius: 20px; padding: 2.5rem;
+            box-shadow: 0 8px 30px rgba(139,115,85,0.1);
+            width: 100%; max-width: 400px; text-align: center;
+        }
+        .login-card h2 { font-size: 1.5rem; color: #3D3D3D; margin-bottom: 0.5rem; }
+        .login-card .subtitle { color: #7A7A7A; margin-bottom: 2rem; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #5A5A5A; margin-bottom: 0.3rem; }
+        .form-group input {
+            width: 100%; padding: 12px 16px; border: 1px solid #E8DFD5; border-radius: 10px;
+            font-size: 0.95rem; color: #3D3D3D; box-sizing: border-box;
+        }
+        .form-group input:focus { outline: none; border-color: #C9A86C; box-shadow: 0 0 0 3px rgba(201,168,108,0.15); }
+        .login-btn {
+            width: 100%; padding: 12px; background: #8B7355; color: white; border: none;
+            border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: background 0.3s; margin-top: 0.5rem;
+        }
+        .login-btn:hover { background: #C9A86C; }
+        .coming-soon { margin-top: 1.5rem; padding: 1rem; background: #FFF3CD; border-radius: 10px; color: #856404; font-size: 0.85rem; display: none; }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">🔐 เข้าสู่ระบบ</h1>
+            </div>
+        </header>
+        <main class="login-wrapper">
+            <div class="login-card">
+                <div style="font-size:3rem;margin-bottom:0.5rem;">💅</div>
+                <h2>NailReal Shop</h2>
+                <p class="subtitle">ระบบจัดการร้านทำเล็บ</p>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>👤 ชื่อผู้ใช้</label>
+                        <input type="text" id="username" placeholder="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🔑 รหัสผ่าน</label>
+                        <input type="password" id="password" placeholder="password" required>
+                    </div>
+                    <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+                </form>
+                <div class="coming-soon" id="comingSoon">
+                    ⚠️ ระบบสมาชิกอยู่ระหว่างพัฒนา<br>จะพร้อมใช้งานเร็วๆ นี้
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="./sidebar.js"></script>
+    <script src="./login.js"></script>
+</body>
+</html>

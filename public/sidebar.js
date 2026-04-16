@@ -13,7 +13,12 @@
         { href: 'customers.html', icon: '👥', label: 'ลูกค้า', match: ['customers.html'] },
         { href: 'services.html', icon: '💅', label: 'บริการ', match: ['services.html', 'service-detail.html'] },
         { href: 'employee_dashboard.html', icon: '🧑‍💼', label: 'พนักงาน', match: ['employee_dashboard.html', 'technician_history.html'] },
+        { href: 'transactions.html', icon: '💰', label: 'การเงิน', match: ['transactions.html'] },
+        { href: 'reports.html', icon: '📊', label: 'รายงาน', match: ['reports.html'] },
         { href: 'admin_panel.html', icon: '⚙️', label: 'Admin', match: ['admin_panel.html'] },
+    ];
+    const footerItems = [
+        { href: 'login.html', icon: '🔐', label: 'เข้าสู่ระบบ', match: ['login.html'] },
     ];
 
     // Find active item
@@ -33,6 +38,17 @@
     const sidebar = document.createElement('aside');
     sidebar.className = 'sidebar';
     sidebar.id = 'sidebar';
+    // Build footer nav (login)
+    const activeFooter = footerItems.find(m => m.match.includes(page));
+    const activeFooterHref = activeFooter ? activeFooter.href : '';
+    const footerHTML = footerItems.map(m => {
+        const isActive = m.href === activeFooterHref ? ' active' : '';
+        return `<a href="${m.href}" class="sidebar-item${isActive}" data-tooltip="${m.label}">
+            <span class="sidebar-icon">${m.icon}</span>
+            <span class="sidebar-label">${m.label}</span>
+        </a>`;
+    }).join('');
+
     sidebar.innerHTML = `
         <div class="sidebar-header">
             <a href="index.html" style="text-decoration:none;">
@@ -42,6 +58,7 @@
         </div>
         <nav class="sidebar-nav">${navHTML}</nav>
         <div class="sidebar-footer">
+            <div style="margin-bottom:0.5rem;">${footerHTML}</div>
             <button class="sidebar-toggle" id="sidebarToggle" title="พับ/กางเมนู">
                 <span class="toggle-icon" id="toggleIcon">◀</span>
             </button>

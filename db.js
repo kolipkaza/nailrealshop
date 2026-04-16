@@ -38,7 +38,10 @@ async function getById(table, id) {
 // Add new record
 async function add(table, record) {
   const data = await load(table);
-  record.id = Date.now().toString();
+  // Preserve custom ID if provided, otherwise generate timestamp-based ID
+  if (!record.id) {
+    record.id = Date.now().toString();
+  }
   record.createdAt = new Date().toISOString();
   data.push(record);
   await save(table, data);
