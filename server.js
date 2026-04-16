@@ -3,7 +3,16 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+
+// LINE Bot
+let lineBot;
+try {
+  lineBot = require('./line-bot');
+} catch (e) {
+  console.log('LINE Bot module error:', e.message);
+  lineBot = null;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -271,6 +280,19 @@ app.patch('/api/appointments/:id/status', async (req, res) => {
     appointment.status = status;
     await db.save('appointments', appointments);
     res.json(appointment);
+
+    // Send LINE notification if appointment was booked via LINE
+    if (lineBot && appointment.lineUserId) {
+      const statusMsg = {
+        'confirmed': 'นัดหมายของคุณได้รับการยืนยันแล้ว ✅\n' + appointment.serviceName + '\n' + appointment.date + ' เวลา ' + appointment.time + ' น.',
+        'in-progress': 'ถึงคิวของคุณแล้ว! กำลังเริ่มให้บริการ 🔄',
+        'completed': 'ให้บริการเสร็จเรียบร้อยแล้ว ขอบคุณที่ใช้บริการค่ะ 💕',
+        'cancelled': 'นัดหมายของคุณถูกยกเลิก ❌\n' + appointment.serviceName + '\n' + appointment.date
+      };
+      if (statusMsg[status]) {
+        lineBot.sendLineNotification(appointment.lineUserId, statusMsg[status]).catch(() => {});
+      }
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -847,6 +869,28 @@ app.get('/api/reports/technicians', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ============ LINE Webhook ============
+if (lineBot) {
+  app.post('/webhook/line', express.json(), (req, res) => {
+    const events = req.body.events;
+    if (events && events.length > 0) {
+      Promise.all(events.map(event => lineBot.handleEvent(event)))
+        .then(() => res.json({ status: 'ok' }))
+        .catch(err => {
+          console.error('LINE webhook error:', err);
+          res.status(500).json({ error: err.message });
+        });
+    } else {
+      res.json({ status: 'ok' });
+    }
+  });
+
+  // Setup Rich Menu on startup
+  lineBot.setupRichMenu();
+
+  console.log('📱 LINE Bot webhook: /webhook/line');
+}
 
 // ============ Start Server ============
 const HOST = '0.0.0.0';
